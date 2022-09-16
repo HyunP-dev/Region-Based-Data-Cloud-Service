@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지역 기반 데이터 클라우드 서비스</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"/>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+          integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+          crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+            integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+            crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monet/0.9.3-485/monet.min.js"></script>
+    <script type="text/javascript">
+        function upload(location) {
+            let uploadDiv = document.querySelector(".upload");
+            if (uploadDiv != null) uploadDiv.remove();
+            uploadDiv = document.createElement("div");
+            uploadDiv.className = "upload";
+            uploadDiv.innerHTML = `
+                <h1>업로드</h1>
+                <hr>
+                <b style="padding-right: 7px">데이터명</b><input type="text" style="width: 500px;">&nbsp;
+                <b style="padding-right: 7px">분류</b>
+                <select id="category" style="width: 72px;height: 22px;">
+                    <option value="사회">사회</option>
+                    <option value="자연과학">자연과학</option>
+                </select>
+                <br><br>
+                <b>데이터 설명</b>
+                <div style="height: 7px"></div>
+                <textarea name="Text1" style="width: calc(100% - 7px); resize: none;" rows="18"></textarea>
+                <div style="height: 7px"></div>
+                <input type="file">
+                <span class="buttons" style="float: right">
+                    <input type="button" style="width: 65px;" value="Upload"><span style="width: 2px"></span>
+                    <input type="button" style="width: 65px;" value="Cancel" onclick="cancelUpload()">
+                </span>`;
+            document.body.appendChild(uploadDiv);
+        }
+
+        function cancelUpload() {
+            document.querySelector(".upload").remove();
+        }
+
+        window.onload = () => {
+            const map = L.map('map').setView([37.8835, 127.73], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: ''
+            }).addTo(map)
+            map.attributionControl.setPrefix('한림대학교 정보과학대학')
+
+            map.on('contextmenu', function (e) {
+                let location = e.latlng
+                console.log(e.latlng)
+                with (location) {
+                    let popup = L.popup()
+                        .setLatLng(e.latlng)
+                        .setContent(`
+                            <div class="upload-popup">
+                                <i class="fa-solid fa-compass"></i>&nbsp;&nbsp;
+                                위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}<br>
+                                <i class="fa-solid fa-table"></i>&nbsp;&nbsp;
+                                <a href="javascript:upload(location);">데이터를 업로드하려면 클릭하세요.</a>
+                            </div>
+                        `)
+                        .openOn(map);
+                }
+            });
+            // upload(null)
+        }
+    </script>
+
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 0;
+        }
+
+        .data {
+            height: 185px;
+            width: 500px;
+            padding: 10px;
+            bottom: 25px;
+            left: 25px;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.75);
+            position: absolute;
+        }
+
+        .data > .title {
+            font-size: larger;
+        }
+
+        .account {
+            z-index: 100;
+            left: 25px;
+            padding: 10px;
+            bottom: 235px;
+            width: 500px;
+            background-color: rgba(255, 255, 255, 0.75);
+            position: absolute;
+            display: table;
+        }
+
+        .account > span {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .upload {
+            --width: 700px;
+            --height: 500px;
+            --padding-horizontal: 20px;
+            z-index: 300;
+            padding-left: var(--padding-horizontal);
+            padding-right: var(--padding-horizontal);
+            width: var(--width);
+            height: var(--height);
+            top: calc(50% - var(--height) / 2);
+            left: calc(50% - var(--width) / 2 - var(--padding-horizontal));
+            background-color: rgba(255, 255, 255, 0.85);
+            position: absolute;
+        }
+
+        .account > span > .fa-solid {
+            padding-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="map">
+</div>
+<div class="account">
+    <span style="float:left;" class="name">
+        <i class="fa-solid fa-user-graduate"></i>박현 « 관리자 »
+    </span>
+    <span style="float:right;">
+        <i class="fa-solid fa-landmark"></i>한림대학교&nbsp;&nbsp;
+        <i class="fa-solid fa-table"></i>5건&nbsp;
+    </span>
+</div>
+<div class="data">
+    <div class="title" style="font-weight: bold">지역 기반 데이터 클라우드 서비스</div>
+    <br>
+    <b style="padding-right: 4px">작성자:</b>박현&nbsp;&nbsp;&nbsp;&nbsp;
+    <b style="padding-right: 4px">분류:</b>사회/범죄&nbsp;&nbsp;&nbsp;
+    <b style="padding-right: 4px">등록일:</b>2022-05-05<br>
+    <hr>
+    국가는 지역간의 균형있는 발전을 위하여 지역경제를 육성할 의무를 진다.
+    대통령은 국가의 안위에 관계되는 중대한 교전상태에 있어서 국가를 보위하기 위하여
+    긴급한 조치가 필요하고 국회의 집회가 불가능한 때에 한하여 법률의 효력을 가지는 명령을 발할 수 있다.
+</div>
+
+</body>
+
+</html>
